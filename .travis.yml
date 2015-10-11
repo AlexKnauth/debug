@@ -1,0 +1,33 @@
+language: c
+
+sudo: false
+
+env:
+  global:
+   - RACKET_DIR=~/racket
+  matrix:
+   - RACKET_VERSION=6.1.1
+   - RACKET_VERSION=6.2
+   - RACKET_VERSION=6.2.1
+   - RACKET_VERSION=HEAD
+
+matrix:
+  allow_failures:
+   - env: RACKET_VERSION=HEAD
+  fast_finish: true
+
+before_install:
+ - cd ..
+ - git clone https://github.com/greghendershott/travis-racket.git
+ - cat travis-racket/install-racket.sh | bash # pipe to bash not sh!
+ - export PATH="${RACKET_DIR}/bin:${PATH}"
+
+install:
+
+before_script:
+
+script:
+ - raco pkg install --deps search-auto --link debug
+ - raco test -x -p debug
+
+after_script:
