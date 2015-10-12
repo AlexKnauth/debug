@@ -2,6 +2,8 @@ debug
 ==
 A meta-language for debugging, based on sugar/debug from [mbutterick/sugar](https://github.com/mbutterick/sugar)
 
+documentation: http://pkg-build.racket-lang.org/doc/debug/index.html
+
 To debug the value of an expression, simply put `debug` in front of the language at the top of
 the file (for instance `#lang debug racket`), and put `#R`, `#RR` or `#RRR` in front of the
 expression.
