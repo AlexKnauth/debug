@@ -1,4 +1,4 @@
-debug
+debug [![Build Status](https://travis-ci.org/AlexKnauth/debug.png?branch=master)](https://travis-ci.org/AlexKnauth/debug)
 ==
 A meta-language for debugging, based on sugar/debug from [mbutterick/sugar](https://github.com/mbutterick/sugar)
 
