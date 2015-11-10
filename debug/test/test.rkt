@@ -16,14 +16,16 @@
       [only-in "completely unexpected!"]
       [report "well, not really"])
   (parameterize ([current-error-port out])
-    #R5)
-  (check-equal? (get-output-string out) "5 = 5\n"))
+    #R5
+    #RN x 5)
+  (check-equal? (get-output-string out) "5 = 5\nx = 5\n"))
 
 (let ([out (open-output-string)]
       [report/line "outta the blue!"])
   (parameterize ([current-error-port out])
-    #RR5)
-  (check-equal? (get-output-string out) "5 = 5 on line 25\n"))
+    #RR5
+    #RRN x 5)
+  (check-equal? (get-output-string out) "5 = 5 on line 26\nx = 5 on line 27\n"))
 
 (begin-for-syntax
   (begin-for-syntax
@@ -31,4 +33,4 @@
       (let ([out (open-output-string)])
         (parameterize ([current-error-port out])
           #RR5)
-        (check-equal? (get-output-string out) "5 = 5 on line 33\n")))))
+        (check-equal? (get-output-string out) "5 = 5 on line 35\n")))))

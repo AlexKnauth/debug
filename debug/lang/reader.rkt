@@ -14,6 +14,7 @@
 ;; https://github.com/mbutterick/sugar/blob/0ffe3173879cef51d29b4c91a336a4de6c3f8ef8/sugar/debug.rkt
 
 (define report-char #\R)
+(define name-char #\N)
 
 (define-simple-macro (require-a-lot require-spec)
   #:with [i ...] (range -10 11)
@@ -47,8 +48,36 @@
 (define (report-proc c in src ln col pos)
   (define c2 (peek-char in))
   (define c3 (peek-char in 1))
+  (define c4 (peek-char in 2))
   (define intro (current-syntax-introducer))
-  (cond [(and (char=? c3 report-char) (char=? c2 report-char))
+  (cond [(and (char=? c2 report-char) (char=? c3 report-char) (char=? c4 name-char))
+         (read-char in)
+         (read-char in)
+         (read-char in)
+         (define/with-syntax name (intro (read-syntax/recursive src in)))
+         (define/with-syntax stx (intro (read-syntax/recursive src in)))
+         (intro
+          #'(let ()
+              (local-require (only-in debug/report [report/file report/file]))
+              (report/file stx name)))]
+        [(and (char=? c2 report-char) (char=? c3 name-char))
+         (read-char in)
+         (read-char in)
+         (define/with-syntax name (intro (read-syntax/recursive src in)))
+         (define/with-syntax stx (intro (read-syntax/recursive src in)))
+         (intro
+          #'(let ()
+              (local-require (only-in debug/report [report/line report/line]))
+              (report/line stx name)))]
+        [(char=? c2 name-char)
+         (read-char in)
+         (define/with-syntax name (intro (read-syntax/recursive src in)))
+         (define/with-syntax stx (intro (read-syntax/recursive src in)))
+         (intro
+          #'(let ()
+              (local-require (only-in debug/report [report report]))
+              (report stx name)))]
+        [(and (char=? c3 report-char) (char=? c2 report-char))
          (read-char in)
          (read-char in)
          (define/with-syntax stx (intro (read-syntax/recursive src in)))
