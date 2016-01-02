@@ -10,7 +10,7 @@
          syntax/parse/define
          (for-syntax racket/base racket/list))
 
-;; from mbutterick/sugar, sugar/debug.rkt, reader submodule
+;; originally from mbutterick/sugar, sugar/debug.rkt, reader submodule
 ;; https://github.com/mbutterick/sugar/blob/0ffe3173879cef51d29b4c91a336a4de6c3f8ef8/sugar/debug.rkt
 
 (define report-char #\R)
