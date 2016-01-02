@@ -40,9 +40,28 @@
           stx)))
   rd)
 
-
+;; current-syntax-introducer : (Parameterof [Syntax -> Syntax])
 (define current-syntax-introducer
   (make-parameter (λ (x) x)))
+
+;; current-intro-id-syntax : (Parameterof (U #false Syntax))
+;; A value of #false means that it is not nested within another debug expression
+;; A syntax object means that it is nested within another debug expression,
+;; where the macros are already bound, and it should use `datum->syntax` with
+;; the syntax object value as the lexical context context.
+(define current-intro-id-syntax
+  (make-parameter #false))
+
+;; maybe-add-let
+(define (maybe-add-local-require ctxt debug-expr)
+  (define/with-syntax expr debug-expr)
+  (cond [(current-intro-id-syntax)
+         #'expr]
+        [else
+         (define/with-syntax debug/report (datum->syntax ctxt 'debug/report))
+         #'(let ()
+             (local-require debug/report)
+             expr)]))
 
 
 (define (report-proc c in src ln col pos)
@@ -54,50 +73,68 @@
          (read-char in)
          (read-char in)
          (read-char in)
+         (define/with-syntax ctxt (or (current-intro-id-syntax) #'here))
+         (define/with-syntax report/file (datum->syntax #'ctxt 'report/file))
          (define/with-syntax name (intro (read-syntax/recursive src in)))
-         (define/with-syntax stx (intro (read-syntax/recursive src in)))
+         (define/with-syntax stx
+           (parameterize ([current-intro-id-syntax #'ctxt])
+             (intro (read-syntax/recursive src in))))
          (intro
-          #'(let ()
-              (local-require (only-in debug/report [report/file report/file]))
-              (report/file stx name)))]
+          (maybe-add-local-require #'ctxt
+                                   #'(report/file stx name)))]
         [(and (char=? c2 report-char) (char=? c3 name-char))
          (read-char in)
          (read-char in)
+         (define/with-syntax ctxt (or (current-intro-id-syntax) #'here))
+         (define/with-syntax report/line (datum->syntax #'ctxt 'report/line))
          (define/with-syntax name (intro (read-syntax/recursive src in)))
-         (define/with-syntax stx (intro (read-syntax/recursive src in)))
+         (define/with-syntax stx
+           (parameterize ([current-intro-id-syntax #'ctxt])
+             (intro (read-syntax/recursive src in))))
          (intro
-          #'(let ()
-              (local-require (only-in debug/report [report/line report/line]))
-              (report/line stx name)))]
+          (maybe-add-local-require #'ctxt
+                                   #'(report/line stx name)))]
         [(char=? c2 name-char)
          (read-char in)
+         (define/with-syntax ctxt (or (current-intro-id-syntax) #'here))
+         (define/with-syntax report (datum->syntax #'ctxt 'report))
          (define/with-syntax name (intro (read-syntax/recursive src in)))
-         (define/with-syntax stx (intro (read-syntax/recursive src in)))
+         (define/with-syntax stx
+           (parameterize ([current-intro-id-syntax #'ctxt])
+             (intro (read-syntax/recursive src in))))
          (intro
-          #'(let ()
-              (local-require (only-in debug/report [report report]))
-              (report stx name)))]
+          (maybe-add-local-require #'ctxt
+                                   #'(report stx name)))]
         [(and (char=? c3 report-char) (char=? c2 report-char))
          (read-char in)
          (read-char in)
-         (define/with-syntax stx (intro (read-syntax/recursive src in)))
+         (define/with-syntax ctxt (or (current-intro-id-syntax) #'here))
+         (define/with-syntax report/file (datum->syntax #'ctxt 'report/file))
+         (define/with-syntax stx
+           (parameterize ([current-intro-id-syntax #'ctxt])
+             (intro (read-syntax/recursive src in))))
          (intro
-          #'(let ()
-              (local-require (only-in debug/report [report/file report/file]))
-              (report/file stx)))]
+          (maybe-add-local-require #'ctxt
+                                   #'(report/file stx)))]
         [(char=? c2 report-char)
          (read-char in)
-         (define/with-syntax stx (intro (read-syntax/recursive src in)))
+         (define/with-syntax ctxt (or (current-intro-id-syntax) #'here))
+         (define/with-syntax report/line (datum->syntax #'ctxt 'report/line))
+         (define/with-syntax stx
+           (parameterize ([current-intro-id-syntax #'ctxt])
+             (intro (read-syntax/recursive src in))))
          (intro
-          #'(let ()
-              (local-require (only-in debug/report [report/line report/line]))
-              (report/line stx)))]
+          (maybe-add-local-require #'ctxt
+                                   #'(report/line stx)))]
         [else
-         (define/with-syntax stx (intro (read-syntax/recursive src in)))
+         (define/with-syntax ctxt (or (current-intro-id-syntax) #'here))
+         (define/with-syntax report (datum->syntax #'ctxt 'report))
+         (define/with-syntax stx
+           (parameterize ([current-intro-id-syntax #'ctxt])
+             (intro (read-syntax/recursive src in))))
          (intro
-          #'(let ()
-              (local-require (only-in debug/report [report report]))
-              (report stx)))]))
+          (maybe-add-local-require #'ctxt
+                                   #'(report stx)))]))
 
 
 (define-values (debug-read debug-read-syntax debug-get-info)
