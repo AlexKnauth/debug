@@ -8,6 +8,9 @@ env:
   matrix:
    - RACKET_VERSION=6.2
    - RACKET_VERSION=6.2.1
+   - RACKET_VERSION=6.3
+   - RACKET_VERSION=6.4
+   - RACKET_VERSION=6.5
    - RACKET_VERSION=HEAD
 
 matrix:
