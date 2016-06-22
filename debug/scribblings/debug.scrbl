@@ -4,12 +4,12 @@
 
 source code: @url{https://github.com/AlexKnauth/debug}
 
-A racket meta-language for debugging, based on sugar/debug.
+A racket lang-extension for debugging, based on sugar/debug.
 
 @section{#lang debug}
 
 @defmodule[debug #:lang]{
-A meta-language (like @racketmodname[at-exp]) that allows for quick debugging
+A lang-extension (like @racketmodname[at-exp]) that allows for quick debugging
 shorthands to a program written in any racket-based language that looks at the
 readtable.
 }

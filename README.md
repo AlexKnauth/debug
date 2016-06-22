@@ -1,6 +1,6 @@
 debug [![Build Status](https://travis-ci.org/AlexKnauth/debug.png?branch=master)](https://travis-ci.org/AlexKnauth/debug)
 ==
-A meta-language for debugging, based on sugar/debug from [mbutterick/sugar](https://github.com/mbutterick/sugar)
+A lang-extension for debugging, based on sugar/debug from [mbutterick/sugar](https://github.com/mbutterick/sugar)
 
 documentation: http://pkg-build.racket-lang.org/doc/debug/index.html
 
