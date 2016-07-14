@@ -25,11 +25,11 @@
                 1)
   (check-equal? (get-output-string o)
                 (string-append
-                 "> 1\n"
-                 "> 7\n"
-                 "> 4\n"
-                 "> 8\n"
-                 "> 20\n"
+                 "> " #;x "1\n"
+                 "> " #;y "7\n"
+                 "> " #;a "4\n"
+                 "> " #;b "8\n"
+                 "> " #;(+ x y a b) "20\n"
                  "> "))
   )
-                 
+
