@@ -3,8 +3,8 @@
 (define collection 'multi)
 
 (define deps
-  '("rackunit-lib"
-    "base"
+  '(["base" #:version "6.3"]
+    "rackunit-lib"
     ))
 
 (define build-deps
