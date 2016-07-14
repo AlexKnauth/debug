@@ -39,3 +39,34 @@ Examples:
 ;(* 3 4) = 12
 ;15
 }
+
+@section{debug-repl}
+
+@defmodule[debug/repl]
+
+@defform[(debug-repl)]{
+Creates a repl for debugging, which can access local variables in the context
+where it is used.
+
+For example a @racket[(debug-repl)] in a @racket[let] form
+@codeblock[#:keep-lang-line? #f]{
+#lang racket
+(let ([x 1] [y 2])
+  (debug-repl))
+}
+Will be able to access the @racket[x] and @racket[y] local variables.
+
+It becomes much more useful in a function definition:
+@codeblock[#:keep-lang-line? #f]{
+#lang racket
+(define (f x y)
+  (debug-repl))
+}
+Then if you call @racket[(f 1 2)], it will create a repl where @racket[x] is
+@racket[1] and @racket[y] is @racket[2].
+
+In one of these repls, you can try evaluating different expressions. If you're
+debugging a higher-order function for example, you can try out the functions
+it accepts or creates with multiple sets of arguments to see how they react.
+}
+
