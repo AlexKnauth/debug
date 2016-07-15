@@ -1,5 +1,9 @@
 #lang scribble/manual
 
+@(require (for-label racket/base
+                     debug/repl
+                     ))
+
 @title{debug}
 
 source code: @url{https://github.com/AlexKnauth/debug}
