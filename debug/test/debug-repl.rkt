@@ -17,7 +17,7 @@
      (debug-repl)
      x)))
 
-(let ([i (open-input-string "x y a b (+ x y a b)")]
+(let ([i (open-input-string "x y a b (+ x y a b) (with-other-vars x)")]
       [o (open-output-string)])
   (check-equal? (parameterize ([current-input-port i]
                                [current-output-port o])
@@ -30,6 +30,7 @@
                  "> " #;a "4\n"
                  "> " #;b "8\n"
                  "> " #;(+ x y a b) "20\n"
+                 "> " #;(with-other-vars x) "1\n"
                  "> "))
   )
 
