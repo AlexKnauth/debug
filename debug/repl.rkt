@@ -37,6 +37,11 @@
   (define ns (variable-reference->namespace varref))
   (for ([pair (in-vector vect)])
     (namespace-set-variable-value! (car pair) (cdr pair) #f ns))
-  (parameterize ([current-namespace ns])
+  (define old-prompt-read (current-prompt-read))
+  (define (new-prompt-read)
+    (write-char #\-)
+    (old-prompt-read))
+  (parameterize ([current-namespace ns]
+                 [current-prompt-read new-prompt-read])
     (read-eval-print-loop)))
 
