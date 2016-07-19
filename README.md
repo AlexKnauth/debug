@@ -55,7 +55,7 @@ Shows the output:
    x
 #<procedure>
 -> y
-'(#<procedure:add1> 4)
+(list #<procedure:add1> 4)
 -> (x string->number "3")
 3
 -> (x (first y) (second y))
