@@ -72,5 +72,9 @@ Then if you call @racket[(f 1 2)], it will create a repl where @racket[x] is
 In one of these repls, you can try evaluating different expressions. If you're
 debugging a higher-order function for example, you can try out the functions
 it accepts or creates with multiple sets of arguments to see how they react.
-}
 
+@defproc[(resume [v any/c] ...) any]{
+  When called inside of a @racket[debug-repl], exits the repl. The call to
+  @racket[debug-repl] returns the arguments to @racket[resume].
+}
+}
