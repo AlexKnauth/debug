@@ -2,7 +2,7 @@
 
 (provide debug-repl)
 
-(require unstable/syntax
+(require "private/make-variable-like-transformer.rkt"
          (for-syntax racket/base
                      racket/list
                      syntax/parse
