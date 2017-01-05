@@ -2,7 +2,8 @@
 
 (provide debug-repl)
 
-(require (for-syntax racket/base
+(require unstable/syntax
+         (for-syntax racket/base
                      racket/list
                      syntax/parse
                      ))
@@ -30,13 +31,18 @@
       [(debug-repl)
        #:with [x ...] (syntax-find-local-variables stx)
        #:with varref (syntax-local-introduce #'(#%variable-reference))
-       #'(debug-repl/varref+hash varref (vector-immutable (cons 'x x) ...))])))
+       #'(debug-repl/varref+hash
+          varref
+          (vector-immutable (cons 'x (λ () x)) ...))])))
 
 ;; debug-repl/varref+hash : Variable-Ref (Vectorof (Cons Symbol Any)) -> Any
 (define (debug-repl/varref+hash varref vect)
   (define ns (variable-reference->namespace varref))
   (for ([pair (in-vector vect)])
-    (namespace-set-variable-value! (car pair) (cdr pair) #f ns))
+    (namespace-define-transformer-binding!
+     ns
+     (car pair)
+     (make-variable-like-transformer #`(#,(cdr pair)))))
   (define old-prompt-read (current-prompt-read))
   (define (new-prompt-read)
     (write-char #\-)
@@ -44,4 +50,8 @@
   (parameterize ([current-namespace ns]
                  [current-prompt-read new-prompt-read])
     (read-eval-print-loop)))
+
+;; namespace-define-transformer-binding! : Namespace Symbol Any -> Void
+(define (namespace-define-transformer-binding! ns sym val)
+  (eval #`(define-syntax #,(datum->syntax #f sym) #,val) ns))
 

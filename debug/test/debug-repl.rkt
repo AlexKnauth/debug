@@ -2,7 +2,8 @@
 
 (require "../repl.rkt" rackunit)
 
-(define a 4)
+(define a 3)
+(define b 4)
 
 (define-syntax-rule (with-other-vars body)
   (let ([x 5] [z 6])
@@ -12,12 +13,12 @@
 (define (f x y)
   ;; x and y are local variables
   (with-other-vars
-   (let ([y 7] [b 8])
-     ;; y and b are local variables
+   (let ([y 7] [b 8] [c 9])
+     ;; y, b, and c are local variables
      (debug-repl)
      x)))
 
-(let ([i (open-input-string "x y a b (+ x y a b) (with-other-vars x)")]
+(let ([i (open-input-string "x y a b c (+ x y a b c) (with-other-vars x)")]
       [o (open-output-string)])
   (check-equal? (parameterize ([current-input-port i]
                                [current-output-port o])
@@ -27,9 +28,10 @@
                 (string-append
                  "-> " #;x "1\n"
                  "-> " #;y "7\n"
-                 "-> " #;a "4\n"
+                 "-> " #;a "3\n"
                  "-> " #;b "8\n"
-                 "-> " #;(+ x y a b) "20\n"
+                 "-> " #;c "9\n"
+                 "-> " #;(+ x y a b c) "28\n"
                  "-> " #;(with-other-vars x) "1\n"
                  "-> "))
   )
