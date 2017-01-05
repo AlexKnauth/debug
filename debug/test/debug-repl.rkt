@@ -36,3 +36,40 @@
                  "-> "))
   )
 
+;; test for issue #9
+(test-case "issue #9"
+  (define (f)
+    (when #true
+      (debug-repl))
+    (define a 1)
+    a)
+
+  (let ([i (open-input-string "y b c (+ y b c)")]
+        [o (open-output-string)])
+    (check-equal? (parameterize ([current-input-port i]
+                                 [current-output-port o])
+                    (f))
+                  1)
+    (check-equal? (get-output-string o)
+                  (string-append
+                   "-> " #;y "7\n"
+                   "-> " #;b "8\n"
+                   "-> " #;c "9\n"
+                   "-> " #;(+ y b c) "24\n"
+                   "-> ")))
+
+  (let ([i (open-input-string "y b c (+ y b c) (+ y a b c)")]
+        [o (open-output-string)])
+    (check-exn #rx"a: undefined;\n cannot use before initialization"
+               (λ ()
+                 (parameterize ([current-input-port i]
+                                [current-output-port o])
+                   (f))))
+    (check-equal? (get-output-string o)
+                  (string-append
+                   "-> " #;y "7\n"
+                   "-> " #;b "8\n"
+                   "-> " #;c "9\n"
+                   "-> " #;(+ y b c) "24\n"
+                   "-> " #;(+ y a b c)))))
+
