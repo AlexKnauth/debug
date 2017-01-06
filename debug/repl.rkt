@@ -23,26 +23,51 @@
   (define (context-subset? a b)
     ;; TODO: use an actual set-of-scopes subset function
     (list-prefix? a b))
+
+  ;; non-macro-id? : Id -> Boolean
+  (define NON-MACRO (gensym 'NON-MACRO))
+  (define (non-macro-id? id)
+    (eq? NON-MACRO (syntax-local-value id (λ () NON-MACRO))))
   )
 
 (define-syntax debug-repl
   (lambda (stx)
     (syntax-parse stx
       [(debug-repl)
-       #:with [x ...] (syntax-find-local-variables stx)
+       #:do [(define all-vars (syntax-find-local-variables stx))
+             (define-values [xs ms]
+               (partition non-macro-id? all-vars))]
+       #:with [x ...] xs
+       #:with [m ...] ms
+       #:with [mv ...] (map (λ (m)
+                              (datum->syntax
+                               stx
+                               `(quote ,(syntax-local-value m))))
+                            ms)
        #:with varref (syntax-local-introduce #'(#%variable-reference))
        #'(debug-repl/varref+hash
           varref
-          (vector-immutable (cons 'x (λ () x)) ...))])))
+          (vector-immutable (cons 'x (λ () x)) ...)
+          (vector-immutable (cons 'm mv) ...))])))
 
-;; debug-repl/varref+hash : Variable-Ref (Vectorof (Cons Symbol Any)) -> Any
-(define (debug-repl/varref+hash varref vect)
+;; debug-repl/varref+hash :
+;; Variable-Ref
+;; (Vectorof (Cons Symbol (-> Any)))
+;; (Vectorof (Cons Symbol Any))
+;; ->
+;; Any
+(define (debug-repl/varref+hash varref var-vect macro-vect)
   (define ns (variable-reference->namespace varref))
-  (for ([pair (in-vector vect)])
+  (for ([pair (in-vector var-vect)])
     (namespace-define-transformer-binding!
      ns
      (car pair)
      (make-variable-like-transformer #`(#,(cdr pair)))))
+  (for ([pair (in-vector macro-vect)])
+    (namespace-define-transformer-binding!
+     ns
+     (car pair)
+     (cdr pair)))
   (define old-prompt-read (current-prompt-read))
   (define (new-prompt-read)
     (write-char #\-)

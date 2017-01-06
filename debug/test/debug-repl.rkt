@@ -1,6 +1,7 @@
 #lang racket/base
 
-(require "../repl.rkt" rackunit)
+(require "../repl.rkt" rackunit
+         (for-syntax racket/base syntax/parse))
 
 (define a 3)
 (define b 4)
@@ -35,6 +36,99 @@
                  "-> " #;(with-other-vars x) "1\n"
                  "-> "))
   )
+
+(test-case "local macros that refer to other macros"
+  (define (f tmp)
+    (define-syntax ?list
+      (syntax-parser
+        [(?list x:expr ...)
+         (define (?list-helper acc xs)
+           (syntax-parse (list acc xs)
+             [([acc:id ...] []) #'(list acc ...)]
+             [([acc:id ...] [x:expr y:expr ...])
+              #:with [tmp] (generate-temporaries #'[x])
+              #`(let ([tmp x])
+                  (if tmp
+                      #,(?list-helper #'[acc ... tmp] #'[y ...])
+                      #false))]))
+         (?list-helper #'[] #'[x ...])]))
+    (debug-repl)
+    tmp)
+
+  (let ([i (open-input-string "y a b c tmp (?list y a b c tmp)")]
+        [o (open-output-string)])
+    (check-equal? (parameterize ([current-input-port i]
+                                 [current-output-port o])
+                    (f 1))
+                  1)
+    (check-equal? (get-output-string o)
+                  (string-append
+                   "-> " #;y "7\n"
+                   "-> " #;a "3\n"
+                   "-> " #;b "8\n"
+                   "-> " #;c "9\n"
+                   "-> " #;tmp "1\n"
+                   "-> " #;(?list y a b c tmp) "'(7 3 8 9 1)\n"
+                   "-> ")))
+
+  (let ([i (open-input-string "(?list . bluh)")]
+        [o (open-output-string)])
+    (check-exn #rx"\\?list: bad syntax"
+               (λ ()
+                 (parameterize ([current-input-port i]
+                                [current-output-port o])
+                   (f 1))))
+    (check-equal? (get-output-string o)
+                  (string-append
+                   "-> " #;(?list. bluh)))))
+
+;; TODO: !!! identifier used out of context !!!
+#;
+(test-case "local macros that refer to other macros"
+  (define (f tmp)
+    (define-syntax ?list-helper
+      (syntax-parser
+        [(?list-helper [acc:id ...] []) #'(list acc ...)]
+        [(?list-helper [acc:id ...] [x:expr y:expr ...])
+         #'(let ([tmp x])
+             (if tmp
+                 (?list-helper [acc ... tmp] [y ...])
+                 #false))]))
+    (define-syntax-rule (?list x ...)
+      (?list-helper [] [x ...]))
+    (debug-repl)
+    tmp)
+
+  (let ([i (open-input-string "y a b c tmp (?list y a b c tmp)")]
+        [o (open-output-string)])
+    (check-equal? (parameterize ([current-input-port i]
+                                 [current-output-port o])
+                    (f 1))
+                  1)
+    (check-equal? (get-output-string o)
+                  (string-append
+                   "-> " #;y "7\n"
+                   "-> " #;a "3\n"
+                   "-> " #;b "8\n"
+                   "-> " #;c "9\n"
+                   "-> " #;tmp "1\n"
+                   "-> " #;(?list y a b c tmp) "'(7 3 8 9 1)\n"
+                   "-> ")))
+
+  (let ([i (open-input-string "y a b c tmp (+ y a b c tmp)")]
+        [o (open-output-string)])
+    (check-exn #rx"a: undefined;\n cannot use before initialization"
+               (λ ()
+                 (parameterize ([current-input-port i]
+                                [current-output-port o])
+                   (f 1))))
+    (check-equal? (get-output-string o)
+                  (string-append
+                   "-> " #;y "7\n"
+                   "-> " #;b "8\n"
+                   "-> " #;c "9\n"
+                   "-> " #;(+ y b c) "24\n"
+                   "-> " #;(+ y a b c)))))
 
 ;; test for issue #9
 (test-case "issue #9"
