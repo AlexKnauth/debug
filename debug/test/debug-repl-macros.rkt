@@ -45,7 +45,7 @@
               (λ () (f 1)))
    (check-equal? (get-output-string o)
                  (string-append
-                  "-> " #;(?list. bluh)))))
+                  "-> " #;(?list . bluh)))))
 
 ;; TODO: !!! identifier used out of context !!!
 #;

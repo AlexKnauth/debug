@@ -3,6 +3,8 @@
 (provide debug-repl resume)
 
 (require "private/make-variable-like-transformer.rkt"
+         racket/list
+         racket/splicing
          (for-syntax racket/base
                      racket/list
                      syntax/parse
@@ -19,10 +21,12 @@
     (define debug-info (syntax-debug-info stx (syntax-local-phase-level) #t))
     (define context (hash-ref debug-info 'context))
     (define bindings (hash-ref debug-info 'bindings))
-    (for/list ([binding (in-list bindings)]
-               #:when (hash-has-key? binding 'local)
-               #:when (context-subset? (hash-ref binding 'context) context))
-      (datum->syntax stx (hash-ref binding 'name))))
+    (remove-duplicates
+     (for/list ([binding (in-list bindings)]
+                #:when (hash-has-key? binding 'local)
+                #:when (context-subset? (hash-ref binding 'context) context))
+       (datum->syntax stx (hash-ref binding 'name) stx))
+     bound-identifier=?))
 
   ;; context-subset? : Context Context -> Boolean
   (define (context-subset? a b)
@@ -52,33 +56,35 @@
        #:with varref (syntax-local-introduce #'(#%variable-reference))
        #'(debug-repl/varref+hash
           varref
-          (vector-immutable (cons 'x (λ () x)) ...)
-          (vector-immutable (cons 'm mv) ...))])))
+          (list (list (quote-syntax x) (λ () x)) ...)
+          (list (list (quote-syntax m) mv) ...))])))
 
 ;; debug-repl/varref+hash :
 ;; Variable-Ref
-;; (Vectorof (Cons Symbol (-> Any)))
-;; (Vectorof (Cons Symbol Any))
+;; (Listof (List Id (-> Any)))
+;; (Listof (List Id Any))
 ;; ->
 ;; Any
-(define (debug-repl/varref+hash varref var-vect macro-vect)
+(define (debug-repl/varref+hash varref var-list macro-list)
   (define ns (variable-reference->namespace varref))
-  (for ([pair (in-vector var-vect)])
-    (namespace-define-transformer-binding!
-     ns
-     (car pair)
-     (make-variable-like-transformer #`(#,(cdr pair)))))
-  (for ([pair (in-vector macro-vect)])
-    (namespace-define-transformer-binding!
-     ns
-     (car pair)
-     (cdr pair)))
+  (define local-bindings
+    (append
+     (for/list ([pair (in-list var-list)])
+       (list
+        (first pair)
+        (make-variable-like-transformer #`(#,(second pair)))))
+     macro-list))
   (define old-prompt-read (current-prompt-read))
+  (define old-eval (current-eval))
   (define (new-prompt-read)
     (write-char #\-)
     (old-prompt-read))
+  (define (new-eval stx)
+    (old-eval #`(splicing-let-syntax #,local-bindings
+                  #,stx)))
   (parameterize ([current-namespace ns]
-                 [current-prompt-read new-prompt-read])
+                 [current-prompt-read new-prompt-read]
+                 [current-eval new-eval])
     (call-with-continuation-prompt
      read-eval-print-loop
      debug-repl-prompt-tag

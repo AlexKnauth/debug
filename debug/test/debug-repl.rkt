@@ -45,29 +45,25 @@
     a)
 
   (test-with-io
-   #:i [i (open-input-string "y b c (+ y b c)")]
+   #:i [i (open-input-string "b (+ b 13)")]
    #:o [o (open-output-string)]
    (check-equal? (f) 1)
    (check-equal? (get-output-string o)
                  (string-append
-                  "-> " #;y "7\n"
-                  "-> " #;b "8\n"
-                  "-> " #;c "9\n"
-                  "-> " #;(+ y b c) "24\n"
+                  "-> " #;b "4\n"
+                  "-> " #;(+ b 13) "17\n"
                   "-> ")))
 
   (test-with-io
-   #:i [i (open-input-string "y b c (+ y b c) (+ y a b c)")]
+   #:i [i (open-input-string "b (+ b 13) (+ a b 13)")]
    #:o [o (open-output-string)]
    (check-exn #rx"a: undefined;\n cannot use before initialization"
               (λ () (f)))
    (check-equal? (get-output-string o)
                  (string-append
-                  "-> " #;y "7\n"
-                  "-> " #;b "8\n"
-                  "-> " #;c "9\n"
-                  "-> " #;(+ y b c) "24\n"
-                  "-> " #;(+ y a b c)))))
+                  "-> " #;b "4\n"
+                  "-> " #;(+ b 13) "17\n"
+                  "-> " #;(+ a b 13)))))
 
 ;; test for mutation
 (define x-for-mutation 1)
