@@ -67,21 +67,24 @@
 ;; Any
 (define (debug-repl/varref+hash varref var-list macro-list)
   (define ns (variable-reference->namespace varref))
-  (define local-bindings
-    (append
-     (for/list ([pair (in-list var-list)])
-       (list
-        (first pair)
-        (make-variable-like-transformer #`(#,(second pair)))))
-     macro-list))
+  (define intro (make-syntax-introducer #true))
+  (for ([pair (in-list var-list)])
+    (namespace-define-transformer-binding!
+     ns
+     (intro (first pair))
+     (make-variable-like-transformer #`(#,(second pair)))))
+  (for ([pair (in-list macro-list)])
+    (namespace-define-transformer-binding!
+     ns
+     (intro (first pair))
+     (second pair)))
   (define old-prompt-read (current-prompt-read))
   (define old-eval (current-eval))
   (define (new-prompt-read)
     (write-char #\-)
     (old-prompt-read))
   (define (new-eval stx)
-    (old-eval #`(splicing-let-syntax #,local-bindings
-                  #,stx)))
+    (old-eval (intro stx)))
   (parameterize ([current-namespace ns]
                  [current-prompt-read new-prompt-read]
                  [current-eval new-eval])

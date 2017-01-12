@@ -22,7 +22,8 @@
                   (if tmp
                       #,(?list-helper #'[acc ... tmp] #'[y ...])
                       #false))]))
-         (?list-helper #'[] #'[x ...])]))
+         (?list-helper #'[] #'[x ...])]
+        [stx (raise-syntax-error #f "bad syntax" #'stx)]))
     (debug-repl)
     tmp)
 
