@@ -23,7 +23,10 @@
                       #,(?list-helper #'[acc ... tmp] #'[y ...])
                       #false))]))
          (?list-helper #'[] #'[x ...])]
-        [stx (raise-syntax-error #f "bad syntax" #'stx)]))
+        [stx
+         ;; TODO: figure out how to make syntax-parse's own errors
+         ;;       not cause infinite loops
+         (raise-syntax-error #f "bad syntax" #'stx)]))
     (debug-repl)
     tmp)
 
