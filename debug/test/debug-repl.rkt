@@ -69,3 +69,39 @@
                   "-> " #;(+ y b c) "24\n"
                   "-> " #;(+ y a b c)))))
 
+;; test for mutation
+(define x-for-mutation 1)
+
+(test-case "test for mutation"
+
+  (define (f1 x-for-mutation)
+    (debug-repl)
+    x-for-mutation)
+
+  (define (f2)
+    (debug-repl)
+    x-for-mutation)
+  
+  (test-with-io
+   #:i [i (open-input-string "x-for-mutation")]
+   #:o [o (open-output-string)]
+   (check-equal? x-for-mutation 1)
+   (check-equal? (f1 2) 2)
+   (check-equal? (get-output-string o)
+                 (string-append
+                  "-> " #;x-for-mutation "2\n"
+                  "-> "))
+   (check-equal? x-for-mutation 1))
+
+  (test-with-io
+   #:i [i (open-input-string "x-for-mutation")]
+   #:o [o (open-output-string)]
+   (check-equal? x-for-mutation 1)
+   (check-equal? (f2) 1)
+   (check-equal? (get-output-string o)
+                 (string-append
+                  "-> " #;x-for-mutation "1\n"
+                  "-> "))
+   (check-equal? x-for-mutation 1)))
+  
+
