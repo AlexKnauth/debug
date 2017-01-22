@@ -58,7 +58,11 @@ For example a @racket[(debug-repl)] in a @racket[let] form
 (let ([x 1] [y 2])
   (debug-repl))
 }
-Will be able to access the @racket[x] and @racket[y] local variables.
+Will be able to access the @racket[x] and @racket[y] local variables (if
+debugging information is enabled in DrRacket's
+@seclink["Language" #:doc '(lib "scribblings/drracket/drracket.scrbl")]{
+  @onscreen{Choose Language}} window, or if the program was executed using
+ @exec{racket -l errortrace -t myprogram.rkt}).
 
 It becomes much more useful in a function definition:
 @codeblock[#:keep-lang-line? #f]{
