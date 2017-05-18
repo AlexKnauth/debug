@@ -16,5 +16,6 @@
     "scribble-lib"
     "racket-doc"
     "scribble-doc"
+    "drracket"
     ))
 
