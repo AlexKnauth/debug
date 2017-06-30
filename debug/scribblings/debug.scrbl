@@ -60,7 +60,8 @@ For example a @racket[(debug-repl)] in a @racket[let] form
 }
 Will be able to access the @racket[x] and @racket[y] local variables (if
 debugging information is enabled in DrRacket's
-@seclink["Language" #:doc '(lib "scribblings/drracket/drracket.scrbl")]{
+@seclink["Language" #:doc '(lib "scribblings/drracket/drracket.scrbl")
+         #:indirect? #true]{
   @onscreen{Choose Language}} window, or if the program was executed using
  @exec{racket -l errortrace -t myprogram.rkt}).
 
