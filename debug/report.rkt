@@ -20,9 +20,9 @@
   (syntax-case stx ()
     [(_ expr) #'(report expr expr)]
     [(_ expr name)
-     #'(let ([expr-result expr]) 
-         (eprintf "~a = ~v\n" 'name expr-result)
-         expr-result)]))
+     #'(let ([expr-results (call-with-values (λ () expr) list)]) 
+         (eprintf "~a = ~a\n" 'name (stringify-results expr-results))
+         (apply values expr-results))]))
 
 
 (define-syntax (report/line stx)
@@ -30,9 +30,9 @@
     [(_ expr) #'(report/line expr expr)]
     [(_ expr name)
      (with-syntax ([line (syntax-line #'expr)])
-       #'(let ([expr-result expr])
-           (eprintf "~a = ~v on line ~v\n" 'name expr-result 'line)
-           expr-result))]))
+       #'(let ([expr-results (call-with-values (λ () expr) list)])
+           (eprintf "~a = ~a on line ~a\n" 'name (stringify-results expr-results) 'line)
+           (apply values expr-results)))]))
 
 
 (define-syntax (report/file stx)
@@ -41,9 +41,9 @@
     [(_ expr name)
      (with-syntax ([file (syntax-source #'expr)]
                    [line (syntax-line #'expr)])
-       #'(let ([expr-result expr])
-           (eprintf "~a = ~v on line ~v in \"~a\"\n" 'name expr-result 'line 'file)
-           expr-result))]))
+       #'(let ([expr-results (call-with-values (λ () expr) list)])
+           (eprintf "~a = ~a on line ~a in \"~a\"\n" 'name (stringify-results expr-results) 'line 'file)
+           (apply values expr-results)))]))
 
 
 (define-syntax-rule (define-multi-version multi-name name)

@@ -4,4 +4,5 @@
 
 (type-environment
  ;; type annotations for report helpers go here:
+ [stringify-results (-> (-lst Univ) -String)]
  )
