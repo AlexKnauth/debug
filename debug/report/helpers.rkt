@@ -7,7 +7,9 @@
 ;; typed/debug/report/helpers.rkt
 
 (provide pass-through-values
-         stringify-results)
+         effect/report
+         effect/report/line
+         effect/report/file)
 
 (require racket/string)
 
@@ -20,6 +22,23 @@
   (let ([lst (call-with-values thunk list)])
     (effect lst)
     (apply values lst)))
+
+;; effect/report : Any -> [(Listof Any) -> Void]
+(define ((effect/report name) expr-results)
+  (eprintf "~a = ~a\n"
+           name (stringify-results expr-results)))
+
+;; effect/report/line : Any Natural -> [(Listof Any) -> Void]
+(define ((effect/report/line name line) expr-results)
+  (eprintf "~a = ~a on line ~a\n"
+           name (stringify-results expr-results) line))
+
+;; effect/report/file : Any Natural Any -> [(Listof Any) -> Void]
+(define ((effect/report/file name line file) expr-results)
+  (eprintf "~a = ~a on line ~a in ~v\n"
+           name (stringify-results expr-results) line file))
+
+;; -------------------------------------------------------------------
 
 ;; stringify-results : (Listof Any) -> String
 (define (stringify-results expr-results)

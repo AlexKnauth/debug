@@ -22,8 +22,7 @@
     [(_ expr name)
      #'(pass-through-values
         (λ () expr)
-        (λ (expr-results)
-          (eprintf "~a = ~a\n" 'name (stringify-results expr-results))))]))
+        (effect/report 'name))]))
 
 
 (define-syntax (report/line stx)
@@ -33,9 +32,7 @@
      (with-syntax ([line (syntax-line #'expr)])
        #'(pass-through-values
           (λ () expr)
-          (λ (expr-results)
-            (eprintf "~a = ~a on line ~a\n"
-                     'name (stringify-results expr-results) 'line))))]))
+          (effect/report/line 'name 'line)))]))
 
 
 (define-syntax (report/file stx)
@@ -46,9 +43,7 @@
                    [line (syntax-line #'expr)])
        #'(pass-through-values
           (λ () expr)
-          (λ (expr-results)
-            (eprintf "~a = ~a on line ~a in \"~a\"\n"
-                     'name (stringify-results expr-results) 'line 'file))))]))
+          (effect/report/file 'name 'line 'file)))]))
 
 
 (define-syntax-rule (define-multi-version multi-name name)
