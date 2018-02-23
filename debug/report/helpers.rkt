@@ -6,9 +6,20 @@
 ;; Type annotations for these helpers should go in
 ;; typed/debug/report/helpers.rkt
 
-(provide stringify-results)
+(provide pass-through-values
+         stringify-results)
 
 (require racket/string)
+
+;; pass-through-values :
+;; (∀ (X ...)
+;;   (-> (-> (values X ...))
+;;       (-> (List X ...) Void)
+;;       (values X ...)))
+(define (pass-through-values thunk effect)
+  (let ([lst (call-with-values thunk list)])
+    (effect lst)
+    (apply values lst)))
 
 ;; stringify-results : (Listof Any) -> String
 (define (stringify-results expr-results)
