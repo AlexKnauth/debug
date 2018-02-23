@@ -16,7 +16,7 @@
 ;; pass-through-values :
 ;; (∀ (X ...)
 ;;   (-> (-> (values X ...))
-;;       (-> (List X ...) Void)
+;;       (-> (Listof Any) Void)
 ;;       (values X ...)))
 (define (pass-through-values thunk effect)
   (let ([lst (call-with-values thunk list)])

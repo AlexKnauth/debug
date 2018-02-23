@@ -8,13 +8,13 @@
  [pass-through-values
   ;; (∀ (X ...)
   ;;   (-> (-> (values X ...))
-  ;;       (-> (List X ...) Void)
+  ;;       (-> (Listof Any) Void)
   ;;       (values X ...)))
   (-polydots (x)
     (cl->*
      (->
       (-> (-values-dots (list) x 'x))
-      (-> (make-ListDots x 'x) -Void)
+      (-> (-lst Univ) -Void)
       (-values-dots (list) x 'x))))]
 
  [effect/report       (-> Univ           (-> (-lst Univ) -Void))]
