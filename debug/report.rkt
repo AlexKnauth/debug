@@ -2,11 +2,19 @@
 
 (provide (all-defined-out))
 
-(require (for-syntax racket/base))
+(require "report/helpers.rkt"
+         (for-syntax racket/base))
 
 ;; from mbutterick/sugar, typed/sugar/debug.rkt
 ;; https://github.com/mbutterick/sugar/blob/0ffe3173879cef51d29b4c91a336a4de6c3f8ef8/typed/sugar/debug.rkt
 ;; using normal racket/base so that it doesn't have a dependancy on typed racket
+
+;; Identifiers referenced in the templates of these macros must be either:
+;;  - defined in racket/base, or
+;;  - defined in "report/helpers.rkt" with type declarations in
+;;    typed/debug/report/helpers
+;;
+;; Otherwise these macros will break in typed racket.
 
 (define-syntax (report stx)
   (syntax-case stx ()
