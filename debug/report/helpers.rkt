@@ -11,7 +11,9 @@
          effect/report/line
          effect/report/file)
 
-(require racket/string)
+(require racket/match
+         racket/struct
+         pretty-format)
 
 ;; pass-through-values :
 ;; (∀ (X ...)
@@ -25,26 +27,31 @@
 
 ;; effect/report : Any -> [(Listof Any) -> Void]
 (define ((effect/report name) expr-results)
-  (eprintf "~a = ~a\n"
-           name (stringify-results expr-results)))
+  (pretty-eprintf "~a = ~v\n"
+                  name (show-results expr-results)))
 
 ;; effect/report/line : Any Natural -> [(Listof Any) -> Void]
 (define ((effect/report/line name line) expr-results)
-  (eprintf "~a = ~a on line ~a\n"
-           name (stringify-results expr-results) line))
+  (pretty-eprintf "~a = ~v on line ~a\n"
+                  name (show-results expr-results) line))
 
 ;; effect/report/file : Any Natural Any -> [(Listof Any) -> Void]
 (define ((effect/report/file name line file) expr-results)
-  (eprintf "~a = ~a on line ~a in ~v\n"
-           name (stringify-results expr-results) line file))
+  (pretty-eprintf "~a = ~v on line ~a in ~v\n"
+                  name (show-results expr-results) line file))
 
 ;; -------------------------------------------------------------------
 
-;; stringify-results : (Listof Any) -> String
-(define (stringify-results expr-results)
-  (format (if (= 1 (length expr-results))
-              "~a"
-              "(values ~a)")
-          (string-join (for/list ([r (in-list expr-results)])
-                         (format "~v" r))
-                       " ")))
+(struct printed-values (vs)
+  #:methods gen:custom-write
+  [(define write-proc
+     (make-constructor-style-printer
+      (λ (self) 'values)
+      (λ (self) (printed-values-vs self))))])
+
+;; show-results : (Listof Any) -> Any
+(define (show-results expr-results)
+  (match expr-results
+    [(list expr-result)  expr-result]
+    [_                   (printed-values expr-results)]))
+
