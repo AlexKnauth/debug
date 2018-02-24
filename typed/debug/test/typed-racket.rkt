@@ -1,8 +1,11 @@
 #lang typed/racket
 
-(require typed/debug/report
-         typed/rackunit)
+(require typed/debug/report)
 
-(define x 5)
+(module+ test
+  (require typed/rackunit)
 
-(check-equal? (ann (report x) : Positive-Byte) 5)
+  (define x 5)
+
+  (check-equal? (ann (report x) : Positive-Byte) 5)
+  )

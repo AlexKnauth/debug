@@ -9,11 +9,13 @@
 (define deps
   '(["base" #:version "6.6.0.3"]
     "rackunit-lib"
+    "typed-racket-lib"
     "pretty-format"
     ))
 
 (define build-deps
   '("rackunit-lib"
+    "rackunit-typed"
     "scribble-lib"
     "racket-doc"
     "scribble-doc"
