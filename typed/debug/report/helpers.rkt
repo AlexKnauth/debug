@@ -4,4 +4,20 @@
 
 (type-environment
  ;; type annotations for report helpers go here:
+
+ [pass-through-values
+  ;; (∀ (X ...)
+  ;;   (-> (-> (values X ...))
+  ;;       (-> (Listof Any) Void)
+  ;;       (values X ...)))
+  (-polydots (x)
+    (cl->*
+     (->
+      (-> (-values-dots (list) x 'x))
+      (-> (-lst Univ) -Void)
+      (-values-dots (list) x 'x))))]
+
+ [effect/report       (-> Univ           (-> (-lst Univ) -Void))]
+ [effect/report/line  (-> Univ -Nat      (-> (-lst Univ) -Void))]
+ [effect/report/file  (-> Univ -Nat Univ (-> (-lst Univ) -Void))]
  )
