@@ -9,6 +9,7 @@
 (define deps
   '(["base" #:version "6.6.0.3"]
     "rackunit-lib"
+    "pretty-format"
     ))
 
 (define build-deps
