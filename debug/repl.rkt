@@ -8,6 +8,7 @@
          (for-syntax racket/base
                      racket/list
                      syntax/parse
+                     pretty-format
                      ))
 
 (define debug-repl-prompt-tag (make-continuation-prompt-tag 'debug-repl))
@@ -20,7 +21,11 @@
   (define (syntax-find-local-variables stx)
     (define debug-info (syntax-debug-info stx (syntax-local-phase-level) #t))
     (unless (hash-has-key? debug-info 'bindings)
-      (eprintf "warning: debug-repl cannot find the local bindings\n"))
+      (pretty-eprintf
+       (string-append
+        "warning: debug-repl cannot find the local bindings\n"
+        "  debug-info: ~v\n")
+       debug-info))
     (define context (hash-ref debug-info 'context))
     (define bindings (hash-ref debug-info 'bindings '()))
     (remove-duplicates
