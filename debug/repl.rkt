@@ -19,8 +19,10 @@
   ;; syntax-find-local-variables : Syntax -> (Listof Id)
   (define (syntax-find-local-variables stx)
     (define debug-info (syntax-debug-info stx (syntax-local-phase-level) #t))
+    (unless (hash-has-key? debug-info 'bindings)
+      (eprintf "warning: debug-repl cannot find the local bindings\n"))
     (define context (hash-ref debug-info 'context))
-    (define bindings (hash-ref debug-info 'bindings))
+    (define bindings (hash-ref debug-info 'bindings '()))
     (remove-duplicates
      (for/list ([binding (in-list bindings)]
                 #:when (hash-has-key? binding 'local)
