@@ -15,7 +15,11 @@
      (->
       (-> (-values-dots (list) x 'x))
       (-> (-lst Univ) -Void)
-      (-values-dots (list) x 'x))))]
+      (-values-dots (list) x 'x))
+     (->
+      (-> ManyUniv)
+      (-> (-lst Univ) -Void)
+      ManyUniv)))]
 
  [effect/report       (-> Univ           (-> (-lst Univ) -Void))]
  [effect/report/line  (-> Univ -Nat      (-> (-lst Univ) -Void))]
