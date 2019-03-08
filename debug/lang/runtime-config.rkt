@@ -2,8 +2,7 @@
 
 (provide configure)
 
-;; TODO: have the `configure` function call a
-;;       `use-debug-readtable` function
+(require (only-in debug/reader use-debug-readtable))
 
 (define (configure data)
-  (void))
+  (use-debug-readtable))

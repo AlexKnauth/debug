@@ -1,6 +1,7 @@
 #lang racket/base
 
 (provide make-debug-readtable
+         use-debug-readtable
          current-syntax-introducer
          wrap-reader)
 
@@ -26,6 +27,11 @@
 
 (define (make-debug-readtable [rt (current-readtable)])
   (make-readtable rt report-char 'dispatch-macro report-proc))
+
+
+(define (use-debug-readtable [orig-rt (current-readtable)])
+  (port-count-lines! (current-input-port))
+  (current-readtable (make-debug-readtable orig-rt)))
 
 
 ;; current-syntax-introducer : (Parameterof [Syntax -> Syntax])
