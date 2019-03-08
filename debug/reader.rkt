@@ -40,6 +40,15 @@
 (define current-intro-id-syntax
   (make-parameter #false))
 
+;; Any -> Any
+(define (add-language-info-prop stx)
+  (cond
+    [(syntax? stx)
+     (define old-prop (syntax-property stx 'module-language))
+     (define new-prop `#(debug/lang/language-info get-language-info ,old-prop))
+     (syntax-property stx 'module-language new-prop)]
+    [else stx]))
+
 (define (wrap-reader reader)
   (define (rd . args)
     (define intro
@@ -49,7 +58,7 @@
              (make-syntax-introducer)]))
     (parameterize ([current-readtable (make-debug-readtable (current-readtable))]
                    [current-syntax-introducer intro])
-      (define stx (apply reader args))
+      (define stx (add-language-info-prop (apply reader args)))
       (if (and (syntax? stx) (version<=? "6.2.900.4" (version)))
           (intro stx)
           stx)))
