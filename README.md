@@ -34,6 +34,10 @@ Shows the output:
 15
 ```
 
+### `#lang debug/no-output`
+
+Allows `#R`, `#RR` and `#RRR` like `#lang debug`, but they don't add any debug output, they just return the expression inside.
+
 ### `debug-repl`
 
 ```racket
