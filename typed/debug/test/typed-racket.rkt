@@ -1,12 +1,12 @@
 #lang typed/racket
 
 (require typed/debug/report)
+(module+ test
+  (require typed/rackunit))
+
+(define x 5)
 
 (module+ test
-  (require typed/rackunit)
-
-  (define x 5)
-
   (define p (open-output-string))
 
   (parameterize ([current-error-port p])
