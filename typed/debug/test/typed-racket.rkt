@@ -7,5 +7,9 @@
 
   (define x 5)
 
-  (check-equal? (ann (report x) : Positive-Byte) 5)
-  )
+  (define p (open-output-string))
+
+  (parameterize ([current-error-port p])
+    (check-equal? (ann (report x) : Positive-Byte) 5))
+
+  (check-equal? (get-output-string p) "x = 5\n"))
