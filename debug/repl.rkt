@@ -1,6 +1,6 @@
 #lang racket/base
 
-(provide debug-repl resume)
+(provide debug-repl)
 
 (require "private/make-variable-like-transformer.rkt"
          racket/list
@@ -10,11 +10,6 @@
                      syntax/parse
                      pretty-format
                      ))
-
-(define debug-repl-prompt-tag (make-continuation-prompt-tag 'debug-repl))
-(define debug-repl-abort-handler values)
-
-;; ----------------------------------------------------------------------------
 
 (begin-for-syntax
   ;; syntax-find-local-variables : Syntax -> (Listof Id)
@@ -95,16 +90,9 @@
   (parameterize ([current-namespace ns]
                  [current-prompt-read new-prompt-read]
                  [current-eval new-eval])
-    (call-with-continuation-prompt
-     read-eval-print-loop
-     debug-repl-prompt-tag
-     debug-repl-abort-handler)))
+    (read-eval-print-loop)))
 
 ;; namespace-define-transformer-binding! : Namespace Symbol Any -> Void
 (define (namespace-define-transformer-binding! ns sym val)
   (eval #`(define-syntax #,(datum->syntax #f sym) #,val) ns))
-
-;; resume : Any ... -> Nothing
-(define (resume . vs)
-  (apply abort-current-continuation debug-repl-prompt-tag vs))
 
