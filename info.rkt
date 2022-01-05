@@ -2,6 +2,8 @@
 
 (define collection 'multi)
 
+(define license 'MIT)
+
 ;; Require a version of racket after this commit:
 ;; make `variable-reference->namespace` enable top-level mode
 ;; d1c2daf15b8be048b5cea63d5a1d7206bfc8d43f
