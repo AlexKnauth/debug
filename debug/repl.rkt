@@ -11,10 +11,7 @@
                      pretty-format
                      ))
 
-(define debug-repl-prompt-tag (make-continuation-prompt-tag 'debug-repl))
-(define debug-repl-abort-handler values)
-
-;; ----------------------------------------------------------------------------
+(define current-debug-repl-escape (make-parameter #f))
 
 (begin-for-syntax
   ;; syntax-find-local-variables : Syntax -> (Listof Id)
@@ -92,13 +89,12 @@
     (old-prompt-read))
   (define (new-eval stx)
     (old-eval (intro stx)))
-  (parameterize ([current-namespace ns]
-                 [current-prompt-read new-prompt-read]
-                 [current-eval new-eval])
-    (call-with-continuation-prompt
-     read-eval-print-loop
-     debug-repl-prompt-tag
-     debug-repl-abort-handler)))
+  (let/ec k
+    (parameterize ([current-namespace ns]
+                   [current-prompt-read new-prompt-read]
+                   [current-eval new-eval]
+                   [current-debug-repl-escape k])
+      (read-eval-print-loop))))
 
 ;; namespace-define-transformer-binding! : Namespace Symbol Any -> Void
 (define (namespace-define-transformer-binding! ns sym val)
@@ -106,5 +102,7 @@
 
 ;; resume : Any ... -> Nothing
 (define (resume . vs)
-  (apply abort-current-continuation debug-repl-prompt-tag vs))
-
+  (define k (current-debug-repl-escape))
+  (unless k
+    (error 'resume "must be called within a debug-repl"))
+  (apply k vs))

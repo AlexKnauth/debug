@@ -1,3 +1,11 @@
+# Racket-generated files
 compiled/
 doc/
+
+# Editor-generated files
 *~
+\#*
+.\#*
+
+# OS-generated files
+.DS_Store
