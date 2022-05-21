@@ -1,4 +1,4 @@
-debug [![Build Status](https://travis-ci.org/AlexKnauth/debug.png?branch=master)](https://travis-ci.org/AlexKnauth/debug)
+debug
 ==
 A lang-extension for debugging, based on sugar/debug from [mbutterick/sugar](https://github.com/mbutterick/sugar)
 
