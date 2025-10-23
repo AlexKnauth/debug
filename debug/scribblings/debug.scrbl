@@ -79,3 +79,18 @@ debugging a higher-order function for example, you can try out the functions
 it accepts or creates with multiple sets of arguments to see how they react.
 }
 
+@defproc[(resume [v any/c] ...) any]{
+Exits a repl created by @racket[debug-repl],
+returning the @racket[v]s from the @racket[(debug-repl)] expression as values.
+
+For example in this function definition:
+@codeblock[#:keep-lang-line? #f]{
+#lang racket
+(define (f x y)
+  (debug-repl))
+}
+On @racket[(f 1 2)],
+it will create a repl where @racket[x] is @racket[1] and @racket[y] is @racket[2].
+Then if you call @racket[(resume (+ x y))] within the repl,
+it will exit the repl and return @racket[3] as the result of @racket[(f 1 2)].
+}
