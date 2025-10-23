@@ -65,5 +65,24 @@ Allows `#R`, `#RR` and `#RRR` like `#lang debug`, but they don't add any debug o
 -> (x (first y) (second y))
 5
 -> ; exit this debug-repl by pressing ctrl-D
+> ; back in the normal repl
 ```
 
+### `resume`
+
+```racket
+> (require debug/repl)
+> (define (f x y)
+    (debug-repl))
+> (f 1 2)
+-> ; in the debug-repl now
+   x
+1
+-> y
+2
+-> (+ x y)
+3
+-> (resume (+ x y)) ; exits the debug-repl by calling resume
+3
+> ; back in the normal repl
+```
