@@ -7,13 +7,13 @@ jobs:
     strategy:
       matrix:
         racket-version: ["stable", "current"]
-        racket-variant: ["BC", "CS"]
+        racket-variant: ["CS"]
     steps:
-      - uses: actions/checkout@v2
-      - uses: Bogdanp/setup-racket@v0.12
+      - uses: actions/checkout@v5
+      - uses: Bogdanp/setup-racket@v1.14
         with:
-          architecture: x64
-          distribution: full
+          architecture: 'x64'
+          distribution: 'full'
           variant: ${{ matrix.racket-variant }}
           version: ${{ matrix.racket-version }}
       - name: Installing debug and its dependencies
